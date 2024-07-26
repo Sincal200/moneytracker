@@ -110,6 +110,8 @@ function App() {
 
   }
 
+  
+
   return (
     <main>
       <form onSubmit={editingTask ? updateTask : addNewTask}>
@@ -151,7 +153,9 @@ function App() {
               </div>
               <div className='right'>
                 <div className='datetime'>{task.datetime}</div>
-                <div className='status'>{task.status}</div>
+                <div className={'status ' + (task.status === "Completed" ? 'green' : task.status === "In Progress" ? 'yellow' : 'red')}>
+            {task.status}
+          </div>
                 <button onClick={() => deleteTask(task._id)}>Delete</button>
                 <button onClick={() => handleEditClick(task)}>Edit</button>
 

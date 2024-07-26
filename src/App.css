@@ -93,12 +93,16 @@ div.right{
   text-align: right;
 }
 
-div.price.green{
+div.status.green{
   color: #1c1;
 }
 
-div.price.red{
+div.status.red{
   color: #c11;
+}
+
+div.status.yellow{
+  color: #cc1;
 }
 
 div.Task div.datetime{
