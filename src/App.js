@@ -132,30 +132,33 @@ function App() {
             <option value="Completed">Completed</option>
           </select>
         </div>
+        <div className='New'>
         <div className='Basics'>
-          <input type="text" 
-          value={title}
-          onChange={ev => setTitle(ev.target.value)} 
-          placeholder={'New Task'}></input>
-          <input value={datetime} 
-          onChange={ev => setDatetime(ev.target.value)}
-          type="datetime-local"></input>
+        
+        <input type="text" 
+        value={title}
+        onChange={ev => setTitle(ev.target.value)} 
+        placeholder={'New Task'}></input>
+        <input value={datetime} 
+        onChange={ev => setDatetime(ev.target.value)}
+        type="datetime-local"></input>
+      </div>
+      <div className='Description'>
+        <input value={description} 
+        onChange={ev => setDescription(ev.target.value)}
+        type="text" placeholder={'Description'}></input>
+      </div>
+      <div className='Status'>
+        <select value={status} 
+        onChange={ev => setStatus(ev.target.value)}>
+          <option value="">Select Status</option>
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        </select>
+      </div>
+      <button type='submit'>{editingTask ? 'Update Task' : 'Add new Task'}</button>
         </div>
-        <div className='Description'>
-          <input value={description} 
-          onChange={ev => setDescription(ev.target.value)}
-          type="text" placeholder={'Description'}></input>
-        </div>
-        <div className='Status'>
-          <select value={status} 
-          onChange={ev => setStatus(ev.target.value)}>
-            <option value="">Select Status</option>
-            <option value="Pending">Pending</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
-          </select>
-        </div>
-        <button type='submit'>{editingTask ? 'Update Task' : 'Add new Task'}</button>
       </form>
       <div className='Tasks'>
         {tasks.length > 0 && tasks.map((task) => (
@@ -169,10 +172,9 @@ function App() {
                 <div className='datetime'>{task.datetime}</div>
                 <div className={'status ' + (task.status === "Completed" ? 'green' : task.status === "In Progress" ? 'yellow' : 'red')}>
             {task.status}
-          </div>
-                <button onClick={() => deleteTask(task._id)}>Delete</button>
-                <button onClick={() => handleEditClick(task)}>Edit</button>
-
+          </div> 
+                <button className='actions' onClick={() => deleteTask(task._id)}>Delete</button>
+                <button className='actions' onClick={() => handleEditClick(task)}>Edit</button>
               </div>
             </div>
           </div>

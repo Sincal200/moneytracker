@@ -1,5 +1,9 @@
 *{
   box-sizing: border-box;
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+
 }
 
 body{
@@ -52,11 +56,13 @@ form div.Basics{
 
 form button{
   width: 100%;
-  margin-top: 5px;
+
   border: 0;
   border-radius: 5px;
   padding: 5px;
   background-color: #ddd;
+  margin-bottom: 15px;
+  font-weight: bold;
 }
 
 div.Tasks{
@@ -110,7 +116,41 @@ div.Task div.datetime{
   color: #888;
 }
 
-div.Title{
+div.Title {
   text-align: center;
   margin: 5px;
+}
+
+.View select{
+  width: 100%;
+  padding: 5px;
+  border-radius: 5px;
+  border: 2px solid #30313d;
+  background-color: #30313d ;
+  color: #ddd;
+  margin-bottom: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.Status{
+  display: flex;
+  justify-content: center;
+}
+
+.Status select{
+  padding: 5px;
+  border-radius: 5px;
+  border: 2px solid #30313d;
+  background-color: #30313d ;
+  color: #ddd;
+  margin-bottom: 15px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.actions{
+  border-radius: 5px;
+  border: 2px solid #30313d;
+  padding: 3px;
 }
