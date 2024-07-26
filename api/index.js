@@ -56,7 +56,7 @@ app.delete('/api/tasks/:id', async (req, res) => {
     }
 });
 
-// Update endpoint
+
 app.put('/tasks/:id', async (req, res) => {
     try {
       const taskId = req.params.id;
@@ -73,6 +73,18 @@ app.put('/tasks/:id', async (req, res) => {
       res.status(500).json({ message: 'Error updating task', error: error });
     }
   });
+
+
+app.get('/api/tasks/:status', async (req, res) => {
+  try {
+      await mongoose.connect(process.env.MONGO_URL);
+      const status = req.params.status;
+      const tasks = await Task.find({ status });
+      res.json(tasks);
+  } catch (error) {
+      res.status(500).json({ message: 'Error fetching tasks by status', error: error });
+  }
+});
 
 
 app.listen(4000);

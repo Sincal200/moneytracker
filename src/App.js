@@ -9,16 +9,19 @@ function App() {
   const [datetime,setDatetime] = useState(''); 
   const [tasks,setTasks] = useState([]);
   const [editingTask, setEditingTask] = useState(null);
+  const [viewStatus, setViewStatus] = useState('');
 
   useEffect(() => {
-    getTasks().then(setTasks);
-  },[]);
+    getTasks(viewStatus).then(setTasks);
+  }, [viewStatus]);
 
-  async function getTasks(){
-    const url='https://ideal-space-journey-g7jqxqqx5w6hp475-4000.app.github.dev/';
+  async function getTasks(status = '') {
+    const url = status 
+      ? `https://ideal-space-journey-g7jqxqqx5w6hp475-4000.app.github.dev/api/tasks/${status}`
+      : 'https://ideal-space-journey-g7jqxqqx5w6hp475-4000.app.github.dev/api/tasks';
     const response = await fetch(url);
+    console.log(status);
     return await response.json();
-
   }
   
   function addNewTask(ev){
@@ -100,6 +103,10 @@ function App() {
     }
   }
 
+  const handleViewStatusChange = (ev) => {
+    setViewStatus(ev.target.value);
+  }
+
 
   const handleEditClick = (task) => {
     setEditingTask(task);
@@ -117,6 +124,14 @@ function App() {
       <form onSubmit={editingTask ? updateTask : addNewTask}>
       <div className='Title'>
         <h1>Task Manager</h1>
+        </div>
+        <div className='View'>
+        <select value={viewStatus} onChange={handleViewStatusChange}>
+            <option value="">All Tasks</option>
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+          </select>
         </div>
         <div className='Basics'>
           <input type="text" 
