@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 
+
 function App() {
   const [title,setTitle] = useState(''); 
   const [description,setDescription] = useState(''); 
@@ -12,17 +13,21 @@ function App() {
   const [viewStatus, setViewStatus] = useState('');
 
   useEffect(() => {
-    getTasks(viewStatus).then(setTasks);
+    const worker = new Worker(new URL('./taskWorker.js', import.meta.url));
+    worker.postMessage({ type: 'FETCH_TASKS', payload: { status: viewStatus } });
+
+    worker.onmessage = function (e) {
+      const { type, tasks } = e.data;
+      if (type === 'FETCH_TASKS_SUCCESS') {
+        setTasks(tasks);
+      }
+    };
+
+    return () => {
+      worker.terminate();
+    };
   }, [viewStatus]);
 
-  async function getTasks(status = '') {
-    const url = status 
-      ? `https://ideal-space-journey-g7jqxqqx5w6hp475-4000.app.github.dev/api/tasks/${status}`
-      : 'https://ideal-space-journey-g7jqxqqx5w6hp475-4000.app.github.dev/api/tasks';
-    const response = await fetch(url);
-    console.log(status);
-    return await response.json();
-  }
   
   function addNewTask(ev){
     ev.preventDefault();
@@ -42,9 +47,14 @@ function App() {
         setDescription('');
         setStatus('');
         setDatetime('');
-        getTasks().then(setTasks);
+        const worker = new Worker(new URL('./taskWorker.js', import.meta.url));
+        worker.onmessage = function (e) {
+          const { type, tasks } = e.data;
+          if (type === 'FETCH_TASKS_SUCCESS') {
+            setTasks(tasks);
+          }
+        };
         console.log('result',json);
-        
       });
     });
   }
