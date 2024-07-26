@@ -3,76 +3,74 @@ import { useEffect, useState } from 'react';
 import './App.css';
 
 function App() {
-  const [name,setName] = useState(''); 
-  const [datetime,setDatetime] = useState(''); 
+  const [title,setTitle] = useState(''); 
   const [description,setDescription] = useState(''); 
-  const [transactions,setTransactions] = useState([]);
-  const [editingTransaction, setEditingTransaction] = useState(null);
+  const [status,setStatus] = useState(''); 
+  const [datetime,setDatetime] = useState(''); 
+  const [tasks,setTasks] = useState([]);
+  const [editingTask, setEditingTask] = useState(null);
 
   useEffect(() => {
-    getTransactions().then(setTransactions);
+    getTasks().then(setTasks);
   },[]);
 
-  async function getTransactions(){
+  async function getTasks(){
     const url='https://ideal-space-journey-g7jqxqqx5w6hp475-4000.app.github.dev/';
     const response = await fetch(url);
     return await response.json();
 
   }
   
-  function addNewTransaction(ev){
+  function addNewTask(ev){
     ev.preventDefault();
-    const url= 'https://ideal-space-journey-g7jqxqqx5w6hp475-4000.app.github.dev/api/transaction';
-    const price = name.split(' ')[0];
+    const url= 'https://ideal-space-journey-g7jqxqqx5w6hp475-4000.app.github.dev/api/task';
     fetch(url,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        price: price,
-        name: name.substring(price.length+1),
+        title,
         description,
+        status,
         datetime,
       })
     }).then(response => {
       response.json().then(json => { 
-        setName('');
-        setDatetime('');
+        setTitle('');
         setDescription('');
-        getTransactions().then(setTransactions);
+        setStatus('');
+        setDatetime('');
+        getTasks().then(setTasks);
         console.log('result',json);
         
       });
     });
   }
 
-  const deleteTransaction = async (id) => {
+  const deleteTask = async (id) => {
     try {
-      const response = await fetch(`https://ideal-space-journey-g7jqxqqx5w6hp475-4000.app.github.dev/api/transactions/${id}`, {
+      const response = await fetch(`https://ideal-space-journey-g7jqxqqx5w6hp475-4000.app.github.dev/api/tasks/${id}`, {
         method: 'DELETE',
       });
       const data = await response.json();
       if (response.status === 200) {
-        // Remove the transaction from the state
-        setTransactions(transactions.filter(transaction => transaction._id !== id));
-        alert(data.message); // Optional: Notify the user
+        setTasks(tasks.filter(task => task._id !== id));
+        alert(data.message); 
       } else {
         throw new Error(data.message);
       }
     } catch (error) {
-      console.error("Failed to delete transaction:", error);
-      alert("Failed to delete transaction."); // Optional: Notify the user
+      console.error("Failed to delete task:", error);
+      alert("Failed to delete task."); 
     }
   }
 
-  // New function to handle updating a transaction
-  const updateTransaction = async (ev) => {
+  const updateTask = async (ev) => {
     ev.preventDefault();
-    const url = `https://ideal-space-journey-g7jqxqqx5w6hp475-4000.app.github.dev/transactions/${editingTransaction._id}`;
-    const price = name.split(' ')[0];
+    const url = `https://ideal-space-journey-g7jqxqqx5w6hp475-4000.app.github.dev/tasks/${editingTask._id}`;
     const updatedData = {
-      price: price,
-      name: name.substring(price.length + 1),
+      title,
       description,
+      status,
       datetime,
     };
     try {
@@ -83,49 +81,43 @@ function App() {
       });
       const data = await response.json();
       if (response.status === 200) {
-        setTransactions(transactions.map(transaction => 
-          transaction._id === editingTransaction._id ? data.transaction : transaction
+        setTasks(tasks.map(task => 
+          task._id === editingTask._id ? data.task : task
         ));
-        setEditingTransaction(null);
-        setName('');
-        setDatetime('');
+        setEditingTask(null);
+        setTitle('');
         setDescription('');
+        setStatus('');
+        setDatetime('');
+
         alert(data.message);
       } else {
         throw new Error(data.message);
       }
     } catch (error) {
-      console.error("Failed to update transaction:", error);
-      alert("Failed to update transaction.");
+      console.error("Failed to update task:", error);
+      alert("Failed to update task.");
     }
   }
 
-  // Function to handle edit button click
-  const handleEditClick = (transaction) => {
-    setEditingTransaction(transaction);
-    setName(`${transaction.price} ${transaction.name}`);
-    setDatetime(transaction.datetime);
-    setDescription(transaction.description);
+
+  const handleEditClick = (task) => {
+    setEditingTask(task);
+    setTitle(task.title);
+    setDescription(task.description);
+    setStatus(task.status);
+    setDatetime(task.datetime);
+
   }
 
-  let balance = 0;
-  for(const transaction of transactions){
-    balance = balance + transaction.price;
-  }
-
-  balance = balance.toFixed(2);
-  const fraction = balance.split('.')[1];
-
-  balance = balance.split('.')[0];
   return (
     <main>
-      <h1>{balance}<span>{fraction}</span></h1>
-      <form onSubmit={editingTransaction ? updateTransaction : addNewTransaction}>
+      <form onSubmit={editingTask ? updateTask : addNewTask}>
         <div className='Basics'>
           <input type="text" 
-          value={name}
-          onChange={ev => setName(ev.target.value)} 
-          placeholder={'+200 new samsung TV'}></input>
+          value={title}
+          onChange={ev => setTitle(ev.target.value)} 
+          placeholder={'New Task'}></input>
           <input value={datetime} 
           onChange={ev => setDatetime(ev.target.value)}
           type="datetime-local"></input>
@@ -135,22 +127,26 @@ function App() {
           onChange={ev => setDescription(ev.target.value)}
           type="text" placeholder={'Description'}></input>
         </div>
-        <button type='submit'>{editingTransaction ? 'Update Transaction' : 'Add new Transaction'}</button>
+        <div className='Status'>
+          <input value={status} 
+          onChange={ev => setStatus(ev.target.value)}
+          type="text" placeholder={'Status'}></input>
+        </div>
+        <button type='submit'>{editingTask ? 'Update Task' : 'Add new Task'}</button>
       </form>
-      <div className='Transactions'>
-        {transactions.length > 0 && transactions.map((transaction) => (
-          <div key={transaction._id}>
-            <div className='Transaction'>
+      <div className='Tasks'>
+        {tasks.length > 0 && tasks.map((task) => (
+          <div key={task._id}>
+            <div className='Task'>
               <div className='left'>
-                <div className='name'>{transaction.name}</div>
-                <div className='description'>{transaction.description}</div>
+                <div className='title'>{task.title}</div>
+                <div className='description'>{task.description}</div>
+                <div className='status'>{task.status}</div>
               </div>
               <div className='right'>
-                <div className={'price ' + (transaction.price < 0 ? 'red' : 'green')}>
-                  {transaction.price}
-                </div>
-                <button onClick={() => deleteTransaction(transaction._id)}>Delete</button>
-                <button onClick={() => handleEditClick(transaction)}>Edit</button>
+                <div className='datetime'>{task.datetime}</div>
+                <button onClick={() => deleteTask(task._id)}>Delete</button>
+                <button onClick={() => handleEditClick(task)}>Edit</button>
               </div>
             </div>
           </div>

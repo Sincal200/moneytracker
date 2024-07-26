@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const Transaction = require('./modules/Transaction.js');
+const Task = require('./modules/Task.js');
 const { default: mongoose } = require('mongoose');
 const app = express();
 
@@ -20,48 +21,56 @@ app.post('/api/transaction',async (req,res) =>{
     res.json(transaction);
 });
 
-
-app.get('/api/transactions',async (req,res) =>{
+  app.post('/api/task',async (req,res) =>{
     await mongoose.connect(process.env.MONGO_URL)
-    const  transactions = await Transaction.find({});
-    res.json(transactions);
+    const {title,description,status,datetime} = req.body;
+    const task = await Task.create({title,description,status,datetime});
+
+    res.json(task);
+});
+
+
+app.get('/api/tasks',async (req,res) =>{
+    await mongoose.connect(process.env.MONGO_URL)
+    const  tasks = await Task.find({});
+    res.json(tasks);
 });
 
 app.get('',async (req,res) =>{
     await mongoose.connect(process.env.MONGO_URL)
-    const  transactions = await Transaction.find({});
-    res.json(transactions);
+    const  tasks = await Task.find({});
+    res.json(tasks);
 });
 
-app.delete('/api/transactions/:id', async (req, res) => {
+app.delete('/api/tasks/:id', async (req, res) => {
     try {
         await mongoose.connect(process.env.MONGO_URL);
-        const result = await Transaction.findByIdAndDelete(req.params.id);
+        const result = await Task.findByIdAndDelete(req.params.id);
         if (result) {
-            res.status(200).json({ message: 'Transaction deleted successfully', _id: req.params.id });
+            res.status(200).json({ message: 'Task deleted successfully', _id: req.params.id });
         } else {
-            res.status(404).json({ message: 'Transaction not found' });
+            res.status(404).json({ message: 'Task not found' });
         }
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting transaction', error: error });
+        res.status(500).json({ message: 'Error deleting task', error: error });
     }
 });
 
 // Update endpoint
-app.put('/transactions/:id', async (req, res) => {
+app.put('/tasks/:id', async (req, res) => {
     try {
-      const transactionId = req.params.id;
+      const taskId = req.params.id;
       const updatedData = req.body;
   
-      const updatedTransaction = await Transaction.findByIdAndUpdate(transactionId, updatedData, { new: true });
+      const updatedTask = await Task.findByIdAndUpdate(taskId, updatedData, { new: true });
   
-      if (updatedTransaction) {
-        res.status(200).json({ message: 'Transaction updated successfully', transaction: updatedTransaction });
+      if (updatedTask) {
+        res.status(200).json({ message: 'Task updated successfully', task: updatedTask });
       } else {
-        res.status(404).json({ message: 'Transaction not found' });
+        res.status(404).json({ message: 'Task not found' });
       }
     } catch (error) {
-      res.status(500).json({ message: 'Error updating transaction', error: error });
+      res.status(500).json({ message: 'Error updating task', error: error });
     }
   });
 

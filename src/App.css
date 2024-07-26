@@ -59,26 +59,31 @@ form button{
   background-color: #ddd;
 }
 
-div.Transactions{
+div.Tasks{
   margin-top: 10px;
+
 }
 
-div.Transaction{
+div.Task{
   display: flex;
   justify-content: space-between;
   padding: 5px 0;
   border-top: 1px solid #30313d;
 }
 
-div.Transaction:first-child{
+div.Task:first-child{
   border-top: 0;
+  margin-bottom: 10px;
+  border: #ddddddaf 1px solid;
+  border-radius: 5px;
+  padding: 5px;
 }
 
-div.Transaction div.name{
+div.Task div.title{
   font-size: 1rem;
 }
 
-div.Transaction div.description{
+div.Task div.description{
   font-size: 0.7rem;
   color: #888;
 }
@@ -95,7 +100,7 @@ div.price.red{
   color: #c11;
 }
 
-div.Transaction div.datetime{
+div.Task div.datetime{
   font-size: 0.7rem;
   color: #888;
 }
