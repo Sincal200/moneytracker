@@ -1,27 +1,20 @@
 
 import { useEffect, useState } from 'react';
 import './App.css';
+import { initializeWorker } from './Worker';
 
 
 function App() {
   const [title,setTitle] = useState(''); 
   const [description,setDescription] = useState(''); 
-  const [status,setStatus] = useState(''); 
+  var [status,setStatus] = useState(''); 
   const [datetime,setDatetime] = useState(''); 
   const [tasks,setTasks] = useState([]);
   const [editingTask, setEditingTask] = useState(null);
   const [viewStatus, setViewStatus] = useState('');
 
   useEffect(() => {
-    const worker = new Worker(new URL('./taskWorker.js', import.meta.url));
-    worker.postMessage({ type: 'FETCH_TASKS', payload: { status: viewStatus } });
-
-    worker.onmessage = function (e) {
-      const { type, tasks } = e.data;
-      if (type === 'FETCH_TASKS_SUCCESS') {
-        setTasks(tasks);
-      }
-    };
+    const worker = initializeWorker(viewStatus, setTasks);
 
     return () => {
       worker.terminate();
@@ -47,15 +40,11 @@ function App() {
         setDescription('');
         setStatus('');
         setDatetime('');
-        const worker = new Worker(new URL('./taskWorker.js', import.meta.url));
-        worker.onmessage = function (e) {
-          const { type, tasks } = e.data;
-          if (type === 'FETCH_TASKS_SUCCESS') {
-            setTasks(tasks);
-          }
-        };
         console.log('result',json);
+        setViewStatus('')
+        initializeWorker(viewStatus, setTasks);
       });
+
     });
   }
 
