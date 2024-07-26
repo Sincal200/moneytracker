@@ -113,6 +113,9 @@ function App() {
   return (
     <main>
       <form onSubmit={editingTask ? updateTask : addNewTask}>
+      <div className='Title'>
+        <h1>Task Manager</h1>
+        </div>
         <div className='Basics'>
           <input type="text" 
           value={title}
@@ -128,9 +131,13 @@ function App() {
           type="text" placeholder={'Description'}></input>
         </div>
         <div className='Status'>
-          <input value={status} 
-          onChange={ev => setStatus(ev.target.value)}
-          type="text" placeholder={'Status'}></input>
+          <select value={status} 
+          onChange={ev => setStatus(ev.target.value)}>
+            <option value="">Select Status</option>
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+          </select>
         </div>
         <button type='submit'>{editingTask ? 'Update Task' : 'Add new Task'}</button>
       </form>
@@ -141,12 +148,13 @@ function App() {
               <div className='left'>
                 <div className='title'>{task.title}</div>
                 <div className='description'>{task.description}</div>
-                <div className='status'>{task.status}</div>
               </div>
               <div className='right'>
                 <div className='datetime'>{task.datetime}</div>
+                <div className='status'>{task.status}</div>
                 <button onClick={() => deleteTask(task._id)}>Delete</button>
                 <button onClick={() => handleEditClick(task)}>Edit</button>
+
               </div>
             </div>
           </div>

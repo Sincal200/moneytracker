@@ -81,10 +81,11 @@ div.Task:first-child{
 
 div.Task div.title{
   font-size: 1rem;
+  font-weight: bold;
 }
 
 div.Task div.description{
-  font-size: 0.7rem;
+  font-size: 1rem;
   color: #888;
 }
 
@@ -101,6 +102,11 @@ div.price.red{
 }
 
 div.Task div.datetime{
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   color: #888;
+}
+
+div.Title{
+  text-align: center;
+  margin: 5px;
 }
