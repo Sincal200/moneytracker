@@ -1,15 +1,14 @@
-
 import { useEffect, useState } from 'react';
 import './App.css';
 import { initializeWorker } from './Worker';
-
+import { addNewTask, deleteTask, updateTask } from './calls';
 
 function App() {
-  const [title,setTitle] = useState(''); 
-  const [description,setDescription] = useState(''); 
-  var [status,setStatus] = useState(''); 
-  const [datetime,setDatetime] = useState(''); 
-  const [tasks,setTasks] = useState([]);
+  const [title, setTitle] = useState(''); 
+  const [description, setDescription] = useState(''); 
+  const [status, setStatus] = useState(''); 
+  const [datetime, setDatetime] = useState(''); 
+  const [tasks, setTasks] = useState([]);
   const [editingTask, setEditingTask] = useState(null);
   const [viewStatus, setViewStatus] = useState('');
 
@@ -21,40 +20,23 @@ function App() {
     };
   }, [viewStatus]);
 
-  
-  function addNewTask(ev){
+  const handleAddNewTask = async (ev) => {
     ev.preventDefault();
-    const url= 'https://ideal-space-journey-g7jqxqqx5w6hp475-4000.app.github.dev/api/task';
-    fetch(url,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        title,
-        description,
-        status,
-        datetime,
-      })
-    }).then(response => {
-      response.json().then(json => { 
-        setTitle('');
-        setDescription('');
-        setStatus('');
-        setDatetime('');
-        console.log('result',json);
-        setViewStatus('')
-        initializeWorker(viewStatus, setTasks);
-      });
+    const task = { title, description, status, datetime };
+    const json = await addNewTask(task);
+    setTitle('');
+    setDescription('');
+    setStatus('');
+    setDatetime('');
+    console.log('result', json);
+    setViewStatus('');
+    initializeWorker(viewStatus, setTasks);
+  };
 
-    });
-  }
-
-  const deleteTask = async (id) => {
+  const handleDeleteTask = async (id) => {
     try {
-      const response = await fetch(`https://ideal-space-journey-g7jqxqqx5w6hp475-4000.app.github.dev/api/tasks/${id}`, {
-        method: 'DELETE',
-      });
-      const data = await response.json();
-      if (response.status === 200) {
+      const data = await deleteTask(id);
+      if (data.message) {
         setTasks(tasks.filter(task => task._id !== id));
         alert(data.message); 
       } else {
@@ -64,25 +46,14 @@ function App() {
       console.error("Failed to delete task:", error);
       alert("Failed to delete task."); 
     }
-  }
+  };
 
-  const updateTask = async (ev) => {
+  const handleUpdateTask = async (ev) => {
     ev.preventDefault();
-    const url = `https://ideal-space-journey-g7jqxqqx5w6hp475-4000.app.github.dev/tasks/${editingTask._id}`;
-    const updatedData = {
-      title,
-      description,
-      status,
-      datetime,
-    };
+    const updatedData = { title, description, status, datetime };
     try {
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedData),
-      });
-      const data = await response.json();
-      if (response.status === 200) {
+      const data = await updateTask(editingTask._id, updatedData);
+      if (data.message) {
         setTasks(tasks.map(task => 
           task._id === editingTask._id ? data.task : task
         ));
@@ -91,7 +62,6 @@ function App() {
         setDescription('');
         setStatus('');
         setDatetime('');
-
         alert(data.message);
       } else {
         throw new Error(data.message);
@@ -100,12 +70,11 @@ function App() {
       console.error("Failed to update task:", error);
       alert("Failed to update task.");
     }
-  }
+  };
 
   const handleViewStatusChange = (ev) => {
     setViewStatus(ev.target.value);
-  }
-
+  };
 
   const handleEditClick = (task) => {
     setEditingTask(task);
@@ -113,19 +82,16 @@ function App() {
     setDescription(task.description);
     setStatus(task.status);
     setDatetime(task.datetime);
-
-  }
-
-  
+  };
 
   return (
     <main>
-      <form onSubmit={editingTask ? updateTask : addNewTask}>
-      <div className='Title'>
-        <h1>Task Manager</h1>
+      <form onSubmit={editingTask ? handleUpdateTask : handleAddNewTask}>
+        <div className='Title'>
+          <h1>Task Manager</h1>
         </div>
         <div className='View'>
-        <select value={viewStatus} onChange={handleViewStatusChange}>
+          <select value={viewStatus} onChange={handleViewStatusChange}>
             <option value="">All Tasks</option>
             <option value="Pending">Pending</option>
             <option value="In Progress">In Progress</option>
@@ -133,31 +99,39 @@ function App() {
           </select>
         </div>
         <div className='New'>
-        <div className='Basics'>
-        
-        <input type="text" 
-        value={title}
-        onChange={ev => setTitle(ev.target.value)} 
-        placeholder={'New Task'}></input>
-        <input value={datetime} 
-        onChange={ev => setDatetime(ev.target.value)}
-        type="datetime-local"></input>
-      </div>
-      <div className='Description'>
-        <input value={description} 
-        onChange={ev => setDescription(ev.target.value)}
-        type="text" placeholder={'Description'}></input>
-      </div>
-      <div className='Status'>
-        <select value={status} 
-        onChange={ev => setStatus(ev.target.value)}>
-          <option value="">Select Status</option>
-          <option value="Pending">Pending</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Completed">Completed</option>
-        </select>
-      </div>
-      <button type='submit'>{editingTask ? 'Update Task' : 'Add new Task'}</button>
+          <div className='Basics'>
+            <input 
+              type="text" 
+              value={title}
+              onChange={ev => setTitle(ev.target.value)} 
+              placeholder={'New Task'}
+            />
+            <input 
+              value={datetime} 
+              onChange={ev => setDatetime(ev.target.value)}
+              type="datetime-local"
+            />
+          </div>
+          <div className='Description'>
+            <input 
+              value={description} 
+              onChange={ev => setDescription(ev.target.value)}
+              type="text" 
+              placeholder={'Description'}
+            />
+          </div>
+          <div className='Status'>
+            <select 
+              value={status} 
+              onChange={ev => setStatus(ev.target.value)}
+            >
+              <option value="">Select Status</option>
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+          <button type='submit'>{editingTask ? 'Update Task' : 'Add new Task'}</button>
         </div>
       </form>
       <div className='Tasks'>
@@ -171,9 +145,9 @@ function App() {
               <div className='right'>
                 <div className='datetime'>{task.datetime}</div>
                 <div className={'status ' + (task.status === "Completed" ? 'green' : task.status === "In Progress" ? 'yellow' : 'red')}>
-            {task.status}
-          </div> 
-                <button className='actions' onClick={() => deleteTask(task._id)}>Delete</button>
+                  {task.status}
+                </div> 
+                <button className='actions' onClick={() => handleDeleteTask(task._id)}>Delete</button>
                 <button className='actions' onClick={() => handleEditClick(task)}>Edit</button>
               </div>
             </div>
@@ -185,4 +159,3 @@ function App() {
 }
 
 export default App;
-

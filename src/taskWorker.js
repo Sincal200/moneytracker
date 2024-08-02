@@ -1,4 +1,5 @@
 // Web Workers para realizar la tarea de carga de datos por separado del hilo principal que es la interfaz grafica
+/* eslint-disable no-restricted-globals */
 self.onmessage = async function (e) {
     const { type, payload } = e.data;
   
@@ -13,10 +14,11 @@ self.onmessage = async function (e) {
     }
   };
 
+  /* eslint-disable no-restricted-globals */
 async function fetchTasks(status = '') {
     const url = status 
-        ? `https://ideal-space-journey-g7jqxqqx5w6hp475-4000.app.github.dev/api/tasks/${status}`
-        : 'https://ideal-space-journey-g7jqxqqx5w6hp475-4000.app.github.dev/api/tasks';
+        ? process.env.REACT_APP_API_URL+`/tasks/${status}`
+        : process.env.REACT_APP_API_URL+'/tasks';
     const response = await fetch(url);
     return await response.json();
 }
